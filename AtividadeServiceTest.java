@@ -4,57 +4,74 @@
 package br.ufrn.imd.inova.testServices;
 
 import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
+import org.apache.directory.api.ldap.extras.extended.ads_impl.whoAmI.WhoAmIResponseStatesEnum;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import br.ufrn.imd.arq.dao.CrudDao;
 import br.ufrn.imd.arq.dominio.Arquivo;
+import br.ufrn.imd.arq.dominio.Usuario;
 import br.ufrn.imd.arq.services.ArquivoService;
 import br.ufrn.imd.arq.services.CrudService;
+import br.ufrn.imd.inova.dao.AtividadeDao;
 import br.ufrn.imd.inova.dominio.Atividade;
+import br.ufrn.imd.inova.dominio.Documento;
+import br.ufrn.imd.inova.dominio.LogAtividade;
+import br.ufrn.imd.inova.dominio.TipoCategoriaCerne;
 import br.ufrn.imd.inova.services.AtividadeService;
 import junit.framework.TestCase;
 
 /**
- * @author Joao
+ * @author Joao Matias
  *
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AtividadeServiceTest extends TestCase {
 
-	@Mock
-	ArquivoService arquivoService = new ArquivoService();
-	
-	SessionFactory sf = mock(SessionFactory.class);
-			
-	@Mock
-	CrudDao crudDao = new CrudDao(sf);
-
 	@InjectMocks
 	AtividadeService ativService = new AtividadeService();
-	
 	@InjectMocks
 	CrudService<Arquivo> crudService = new CrudService<Arquivo>();
 
+	SessionFactory sf = mock(SessionFactory.class);
+
 	Atividade obj = new Atividade();
 	Arquivo arquivo = new Arquivo();
+	LogAtividade logAtiv = new LogAtividade();
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#salvarOuAtualizar(br.ufrn.imd.inova.dominio.Atividade)}
-	 * .
-	 */
+	@Mock
+	ArquivoService arquivoService;
+	@Mock
+	CrudDao crudDao = new CrudDao(sf);
+	@Mock
+	AtividadeDao ativDao;
+
+	List<Atividade> resultAtiv = new ArrayList<Atividade>();
+	List<Atividade> resultAtivEsperado = new ArrayList<Atividade>();
+
+	List<LogAtividade> resultLog = new ArrayList<LogAtividade>();
+	List<LogAtividade> resultLogEsperado = new ArrayList<LogAtividade>();
+
+	private void prepararResultadosAtiv() {
+		// TODO Auto-generated method stub
+		resultAtivEsperado = new ArrayList<Atividade>();
+		resultAtivEsperado.add(obj);
+		resultAtiv = new ArrayList<Atividade>();
+	}
+
+	private void prepararResultadosLog() {
+		resultLogEsperado = new ArrayList<LogAtividade>();
+		resultLogEsperado.add(logAtiv);
+		resultLog = new ArrayList<LogAtividade>();
+	}
+
 	@Test
 	public void testSalvarOuAtualizarAtividade() {
 		// Preparar
@@ -71,92 +88,148 @@ public class AtividadeServiceTest extends TestCase {
 		verify(crudDao).salvarOuAtualizar(obj);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#listar()}.
-	 */
+	@Test
 	public void testListar() {
-		fail("Not yet implemented");
+		// Preparar
+		prepararResultadosAtiv();
+		when(ativDao.listar()).thenReturn(resultAtivEsperado);
+
+		// Testar
+		resultAtiv = ativService.listar();
+
+		// Verificar
+		verify(ativDao).listar();
+		assertEquals(resultAtivEsperado, resultAtiv);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#buscarPorTitulo(java.lang.String)}
-	 * .
-	 */
+	@Test
 	public void testBuscarPorTitulo() {
-		fail("Not yet implemented");
+		// Preparar
+		prepararResultadosAtiv();
+		String titulo = "discente";
+
+		when(ativDao.buscarPorTitulo(titulo)).thenReturn(resultAtivEsperado);
+
+		// Testar
+		resultAtiv = ativService.buscarPorTitulo(titulo);
+
+		// Verificar
+		verify(ativDao).buscarPorTitulo(titulo);
+		assertEquals(resultAtivEsperado, resultAtiv);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#buscarPorNome(java.lang.String)}
-	 * .
-	 */
+	@Test
 	public void testBuscarPorNome() {
-		fail("Not yet implemented");
+		// Preparar
+		prepararResultadosAtiv();
+		String nome = "João Matias";
+		when(ativDao.buscarPorNome(nome)).thenReturn(resultAtivEsperado);
+
+		// Testar
+		resultAtiv = ativService.buscarPorNome(nome);
+
+		// Verificar
+		verify(ativDao).buscarPorNome(nome);
+		assertEquals(resultAtivEsperado, resultAtiv);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#logsByAtividade(br.ufrn.imd.inova.dominio.Atividade)}
-	 * .
-	 */
+	@Test
 	public void testLogsByAtividade() {
-		fail("Not yet implemented");
+		// Preparar
+		prepararResultadosLog();
+		when(ativDao.logsByAtividade(obj)).thenReturn(resultLogEsperado);
+
+		// Testar
+		resultLog = ativService.logsByAtividade(obj);
+
+		// Verificar
+		verify(ativDao).logsByAtividade(obj);
+		assertEquals(resultLogEsperado, resultLog);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#logByAtividadeId(int)}
-	 * .
-	 */
+	@Test
 	public void testLogByAtividadeId() {
-		fail("Not yet implemented");
+		// Preparar
+		int atividadeId = 0;
+		Atividade resultAtiv = new Atividade();
+		when(ativDao.logsByAtividadeId(atividadeId)).thenReturn(obj);
+
+		// Testar
+		resultAtiv = ativService.logByAtividadeId(atividadeId);
+
+		// Verificar
+		verify(ativDao).logsByAtividadeId(atividadeId);
+		assertEquals(obj, resultAtiv);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#atividadesByResponsavel(br.ufrn.imd.arq.dominio.Usuario)}
-	 * .
-	 */
+	@Test
 	public void testAtividadesByResponsavel() {
-		fail("Not yet implemented");
+		// Preparar
+		prepararResultadosAtiv();
+		Usuario responsavel = mock(Usuario.class);
+		when(ativDao.atividadesByResponsavel(responsavel)).thenReturn(resultAtivEsperado);
+
+		// Testar
+		resultAtiv = ativService.atividadesByResponsavel(responsavel);
+
+		// Verificar
+		verify(ativDao).atividadesByResponsavel(responsavel);
+		assertEquals(resultAtivEsperado, resultAtiv);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#atividadesFazer()}.
-	 */
+	@Test
 	public void testAtividadesFazer() {
-		fail("Not yet implemented");
+		// Preparar
+		prepararResultadosAtiv();
+		when(ativDao.atividadesFazer()).thenReturn(resultAtivEsperado);
+
+		// Testar
+		resultAtiv = ativService.atividadesFazer();
+
+		// Verificar
+		verify(ativDao).atividadesFazer();
+		assertEquals(resultAtivEsperado, resultAtiv);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#atividadesAndamento()}
-	 * .
-	 */
+	@Test
 	public void testAtividadesAndamento() {
-		fail("Not yet implemented");
+		// Preparar
+		prepararResultadosAtiv();
+		when(ativDao.atividadesAndamento()).thenReturn(resultAtivEsperado);
+
+		// Testar
+		resultAtiv = ativService.atividadesAndamento();
+
+		// Verificar
+		verify(ativDao).atividadesAndamento();
+		assertEquals(resultAtivEsperado, resultAtiv);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#atividadesConcluida()}
-	 * .
-	 */
+	@Test
 	public void testAtividadesConcluida() {
-		fail("Not yet implemented");
+		// Preparar
+		prepararResultadosAtiv();
+		when(ativDao.atividadesConcluida()).thenReturn(resultAtivEsperado);
+
+		// Testar
+		resultAtiv = ativService.atividadesConcluida();
+
+		// Verificar
+		verify(ativDao).atividadesConcluida();
+		assertEquals(resultAtivEsperado, resultAtiv);
 	}
 
-	/**
-	 * Test method for
-	 * {@link br.ufrn.imd.inova.services.AtividadeService#categoriaCerneByAtividade(br.ufrn.imd.inova.dominio.Atividade)}
-	 * .
-	 */
+	@Test
 	public void testCategoriaCerneByAtividade() {
-		fail("Not yet implemented");
+		// Preparar
+		List<TipoCategoriaCerne> listCategoria = new ArrayList<TipoCategoriaCerne>();
+		when(ativDao.categoriaCerneByAtividade(obj)).thenReturn(listCategoria);
+
+		// Testar
+		ativService.categoriaCerneByAtividade(obj);
+
+		// Verificar
+		verify(ativDao).categoriaCerneByAtividade(obj);
 	}
 
 }
